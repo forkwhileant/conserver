@@ -933,8 +933,23 @@ FileRead(CONSFILE *cfp, void *buf, int len)
 		    FD_SET(cfp->fd, &winit);
 		    retval = 0;
 		    break;
+		case SSL_ERROR_SSL:
+		    Error("FileRead(): SSL protocol error on fd %d", cfp->fd);
+		    ERR_print_errors_fp(stderr);
+		    /* fall through */
+		case SSL_ERROR_SYSCALL:
+		    if (retval == 0) {
+			Error("FileRead(): SSL connection closed unexpectedly on fd %d", cfp->fd);
+		    } else {
+			Error("FileRead(): SSL I/O error on fd %d: %s", cfp->fd, strerror(errno));
+		    }
+		    /* fall through */
 		default:
-		    Error("FileRead(): SSL error on fd %d", cfp->fd);
+		    if (SSL_get_error(cfp->ssl, retval) != SSL_ERROR_SSL && 
+			SSL_get_error(cfp->ssl, retval) != SSL_ERROR_SYSCALL) {
+			Error("FileRead(): Unhandled SSL error %d on fd %d", 
+			      SSL_get_error(cfp->ssl, retval), cfp->fd);
+		    }
 		    /* fall through */
 		case SSL_ERROR_ZERO_RETURN:
 		    retval = -1;
@@ -1128,8 +1143,23 @@ FileWrite(CONSFILE *cfp, FLAG bufferonly, char *buf, int len)
 		    case SSL_ERROR_WANT_WRITE:
 			retval = len_out = 0;
 			break;
+		    case SSL_ERROR_SSL:
+			Error("FileWrite(): SSL protocol error on fd %d", cfp->fd);
+			ERR_print_errors_fp(stderr);
+			/* fall through */
+		    case SSL_ERROR_SYSCALL:
+			if (retval == 0) {
+			    Error("FileWrite(): SSL connection closed unexpectedly on fd %d", cfp->fd);
+			} else {
+			    Error("FileWrite(): SSL I/O error on fd %d: %s", cfp->fd, strerror(errno));
+			}
+			/* fall through */
 		    default:
-			Error("FileWrite(): SSL error on fd %d", cfp->fd);
+			if (SSL_get_error(cfp->ssl, retval) != SSL_ERROR_SSL && 
+			    SSL_get_error(cfp->ssl, retval) != SSL_ERROR_SYSCALL) {
+			    Error("FileWrite(): Unhandled SSL error %d on fd %d", 
+				  SSL_get_error(cfp->ssl, retval), cfp->fd);
+			}
 			/* fall through */
 		    case SSL_ERROR_ZERO_RETURN:
 			retval = -1;
@@ -1748,8 +1778,23 @@ FileSSLAccept(CONSFILE *cfp)
 	    cfp->waitForWrite = FLAGTRUE;
 	    FD_SET(cfp->fd, &winit);
 	    return 0;
+	case SSL_ERROR_SSL:
+	    Error("FileSSLAccept(): SSL protocol error on fd %d", cfp->fd);
+	    ERR_print_errors_fp(stderr);
+	    /* fall through */
+	case SSL_ERROR_SYSCALL:
+	    if (retval == 0) {
+		Error("FileSSLAccept(): SSL connection closed unexpectedly on fd %d", cfp->fd);
+	    } else {
+		Error("FileSSLAccept(): SSL I/O error on fd %d: %s", cfp->fd, strerror(errno));
+	    }
+	    /* fall through */
 	default:
-	    Error("FileSSLAccept(): SSL error on fd %d", cfp->fd);
+	    if (SSL_get_error(cfp->ssl, retval) != SSL_ERROR_SSL && 
+		SSL_get_error(cfp->ssl, retval) != SSL_ERROR_SYSCALL) {
+		Error("FileSSLAccept(): Unhandled SSL error %d on fd %d", 
+		      SSL_get_error(cfp->ssl, retval), cfp->fd);
+	    }
 	    /* fall through */
 	case SSL_ERROR_ZERO_RETURN:
 	    SSL_free(cfp->ssl);

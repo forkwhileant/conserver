@@ -3094,7 +3094,10 @@ StrCpy(char *dst, const char *src, unsigned int size)
 #ifdef HAVE_STRLCPY
     strlcpy(dst, src, size);
 #else
-    strcpy(dst, src);
+    if (size > 0) {
+        strncpy(dst, src, size - 1);
+        dst[size - 1] = '\0';
+    }
 #endif
 }
 

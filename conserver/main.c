@@ -578,7 +578,7 @@ static void
 Usage(int wantfull)
 {
     static char u_terse[] =
-	"[-7dDEFhinoRSuvV] [-a type] [-m max] [-M master] [-p port] [-b port] [-c cred] [-C config] [-P passwd] [-L logfile] [-O min] [-U logfile]";
+	"[-7dDEFhijnoRSuvV] [-a type] [-m max] [-M master] [-p port] [-b port] [-c cred] [-C config] [-P passwd] [-L logfile] [-O min] [-U logfile]";
     static char *full[] = {
 	"7          strip the high bit off all console data",
 	"a type     set the default access type",
@@ -599,6 +599,7 @@ Usage(int wantfull)
 	"F          do not automatically reinitialize failed consoles",
 	"h          output this message",
 	"i          initialize console connections on demand",
+	"j          suppress timestamp, progname, and pid in output",
 	"L logfile  give a new logfile path to the server process",
 	"m max      maximum consoles managed per process",
 #if USE_UNIX_DOMAIN_SOCKETS
@@ -1230,7 +1231,7 @@ main(int argc, char **argv)
 {
     int i;
     FILE *fpConfig = (FILE *)0;
-    static char acOpts[] = "7a:b:c:C:dDEFhiL:m:M:noO:p:P:RSuU:Vv";
+    static char acOpts[] = "7a:b:c:C:dDEFhijL:m:M:noO:p:P:RSuU:Vv";
     extern int optopt;
     extern char *optarg;
     struct passwd *pwd;
@@ -1341,6 +1342,9 @@ main(int argc, char **argv)
 		Bye(EX_OK);
 	    case 'i':
 		fNoinit = 1;
+		break;
+	    case 'j':
+		fQuiet = 1;
 		break;
 	    case 'L':
 		if ((optConf->logfile = StrDup(optarg)) == (char *)0)

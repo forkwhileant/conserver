@@ -516,10 +516,12 @@ GetPort(char *pcToHost, unsigned short sPort)
     char host[NI_MAXHOST];
     char serv[NI_MAXSERV];
     struct addrinfo *ai, *rp, hints;
-#elif USE_UNIX_DOMAIN_SOCKETS
+#endif
+#if USE_UNIX_DOMAIN_SOCKETS
     struct sockaddr_un port;
     static STRING *portPath = (STRING *)0;
-#else
+#endif
+#if !USE_IPV6 && !USE_UNIX_DOMAIN_SOCKETS
     struct hostent *hp = (struct hostent *)0;
     struct sockaddr_in port;
 #endif
@@ -586,7 +588,8 @@ GetPort(char *pcToHost, unsigned short sPort)
     return (CONSFILE *)0;
   success:
     freeaddrinfo(ai);
-#elif USE_UNIX_DOMAIN_SOCKETS
+#endif
+#if USE_UNIX_DOMAIN_SOCKETS
     if (portPath == (STRING *)0)
 	portPath = AllocString();
     BuildStringPrint(portPath, "%s/%hu", config->master, sPort);

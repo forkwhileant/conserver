@@ -1360,6 +1360,8 @@ ProcessUsername(CONSENT *c, char *id)
 	return;
     }
     c->username = strdup(id);
+    if (c->username == (char *)0)
+	OutOfMem();
 }
 
 void
@@ -1809,6 +1811,8 @@ ProcessPassword(CONSENT *c, char *id)
 	return;
     }
     c->password = strdup(id);
+    if (c->password == (char *)0)
+	OutOfMem();
 }
 
 void

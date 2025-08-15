@@ -294,6 +294,7 @@ Usage(int wantfull)
 	"k         abort connection if the console is not 'up'",
 	"l user    use username instead of current username",
 	"M master  master server to poll first",
+	"j         suppress timestamp, progname, and pid in output",
 	"n         do not read system-wide config file",
 	"p port    port to connect to",
 	"P         display pids of daemon(s)",
@@ -319,7 +320,7 @@ Usage(int wantfull)
        %s [generic-args] [-iIuwWx] [console]\n\
        %s [generic-args] [-hPqQrRV] [-[bB] message] [-d [user][@console]]\n\
                               [-t [user][@console] message] [-[zZ] cmd]\n\n\
-       generic-args: [-7DEknUv] [-c cred] [-C config] [-M master]\n\
+       generic-args: [-7DEjknUv] [-c cred] [-C config] [-M master]\n\
                      [-p port] [-l username]\n", progname, progname, progname);
 
     if (wantfull) {
@@ -1928,7 +1929,7 @@ main(int argc, char **argv)
     int fLocal;
     static STRING *acPorts = (STRING *)0;
     static char acOpts[] =
-	"7aAb:B:c:C:d:De:EfFhikIl:M:np:PqQrRsSt:uUvVwWxz:Z:";
+	"7aAb:B:c:C:d:De:EfFhikIjl:M:np:PqQrRsSt:uUvVwWxz:Z:";
     extern int optind;
     extern int optopt;
     extern char *optarg;
@@ -2074,6 +2075,10 @@ main(int argc, char **argv)
 
 	    case 'n':
 		readSystemConf = 0;
+		break;
+
+	    case 'j':		/* suppress timestamp, progname, and pid */
+		fQuiet = 1;
 		break;
 
 	    case 'p':

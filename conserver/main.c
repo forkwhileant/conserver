@@ -578,7 +578,7 @@ static void
 Usage(int wantfull)
 {
     static char u_terse[] =
-	"[-7dDEFhinoRSuvV] [-a type] [-m max] [-M master] [-p port] [-b port] [-c cred] [-C config] [-P passwd] [-L logfile] [-O min] [-U logfile]";
+	"[-7dDEFGhinNoRSTuvV] [-a type] [-m max] [-M master] [-p port] [-b port] [-c cred] [-C config] [-P passwd] [-L logfile] [-O min] [-U logfile]";
     static char *full[] = {
 	"7          strip the high bit off all console data",
 	"a type     set the default access type",
@@ -597,6 +597,7 @@ Usage(int wantfull)
 	"E          ignored - encryption not compiled into code",
 #endif
 	"F          do not automatically reinitialize failed consoles",
+	"G          suppress pid in all output messages",
 	"h          output this message",
 	"i          initialize console connections on demand",
 	"L logfile  give a new logfile path to the server process",
@@ -607,6 +608,7 @@ Usage(int wantfull)
 	"M master   address to listen on (all addresses by default)",
 #endif
 	"n          obsolete - see -u",
+	"N          suppress program name in all output messages",
 	"o          reopen downed console on client connect",
 	"O min      reopen all downed consoles every <min> minutes",
 #if USE_UNIX_DOMAIN_SOCKETS
@@ -617,6 +619,7 @@ Usage(int wantfull)
 	"P passwd   give a new passwd file to the server process",
 	"R          disable automatic client redirection",
 	"S          syntax check of configuration file",
+	"T          suppress timestamp in all output messages",
 	"u          copy \"unloved\" console data to stdout",
 	"U logfile  copy all console data to the \"unified\" logfile",
 	"v          be verbose on startup",
@@ -1230,7 +1233,7 @@ main(int argc, char **argv)
 {
     int i;
     FILE *fpConfig = (FILE *)0;
-    static char acOpts[] = "7a:b:c:C:dDEFhiL:m:M:noO:p:P:RSuU:Vv";
+    static char acOpts[] = "7a:b:c:C:dDEFGhiL:m:M:nNoO:p:P:RSuTU:Vv";
     extern int optopt;
     extern char *optarg;
     struct passwd *pwd;
@@ -1336,6 +1339,9 @@ main(int argc, char **argv)
 	    case 'F':
 		fNoautoreup = 1;
 		break;
+	    case 'G':		/* suppress pid */
+		fSuppressPid = 1;
+		break;
 	    case 'h':
 		Usage(1);
 		Bye(EX_OK);
@@ -1360,6 +1366,9 @@ main(int argc, char **argv)
 	    case 'n':
 		/* noop now */
 		break;
+	    case 'N':		/* suppress progname */
+		fSuppressProgname = 1;
+		break;
 	    case 'o':
 		/* try reopening downed consoles on connect */
 		fReopen = 1;
@@ -1381,6 +1390,9 @@ main(int argc, char **argv)
 		break;
 	    case 'S':
 		fSyntaxOnly++;
+		break;
+	    case 'T':		/* suppress time */
+		fSuppressTime = 1;
 		break;
 	    case 'u':
 		fAll = 1;

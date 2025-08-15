@@ -21,7 +21,7 @@
 #endif
 
 
-int fVerbose = 0, fErrorPrinted = 0;
+int fVerbose = 0, fErrorPrinted = 0, fSuppressTime = 0, fSuppressProgname = 0, fSuppressPid = 0;
 int isMultiProc = 0;
 char *progname = "conserver package";
 pid_t thepid = 0;
@@ -483,13 +483,36 @@ Debug(int level, char *fmt, ...)
     if (fDebug < level)
 	return;
     va_start(ap, fmt);
-    if (isMultiProc)
-	fprintf(stderr, "[%s] %s (%lu): DEBUG: [%s:%d] ",
-		StrTime((time_t *)0), progname, (unsigned long)thepid,
-		debugFileName, debugLineNo);
-    else
-	fprintf(stderr, "%s: DEBUG: [%s:%d] ", progname, debugFileName,
-		debugLineNo);
+    if (isMultiProc) {
+	if (fSuppressTime && fSuppressProgname && fSuppressPid)
+	    fprintf(stderr, "DEBUG: [%s:%d] ", debugFileName, debugLineNo);
+	else if (fSuppressTime && fSuppressProgname)
+	    fprintf(stderr, "(%lu): DEBUG: [%s:%d] ", 
+		    (unsigned long)thepid, debugFileName, debugLineNo);
+	else if (fSuppressTime && fSuppressPid)
+	    fprintf(stderr, "%s: DEBUG: [%s:%d] ", progname, debugFileName, debugLineNo);
+	else if (fSuppressProgname && fSuppressPid)
+	    fprintf(stderr, "[%s] DEBUG: [%s:%d] ",
+		    StrTime((time_t *)0), debugFileName, debugLineNo);
+	else if (fSuppressTime)
+	    fprintf(stderr, "%s (%lu): DEBUG: [%s:%d] ", progname,
+		    (unsigned long)thepid, debugFileName, debugLineNo);
+	else if (fSuppressProgname)
+	    fprintf(stderr, "[%s] (%lu): DEBUG: [%s:%d] ",
+		    StrTime((time_t *)0), (unsigned long)thepid, debugFileName, debugLineNo);
+	else if (fSuppressPid)
+	    fprintf(stderr, "[%s] %s: DEBUG: [%s:%d] ",
+		    StrTime((time_t *)0), progname, debugFileName, debugLineNo);
+	else
+	    fprintf(stderr, "[%s] %s (%lu): DEBUG: [%s:%d] ",
+		    StrTime((time_t *)0), progname, (unsigned long)thepid,
+		    debugFileName, debugLineNo);
+    } else {
+	if (fSuppressProgname)
+	    fprintf(stderr, "DEBUG: [%s:%d] ", debugFileName, debugLineNo);
+	else
+	    fprintf(stderr, "%s: DEBUG: [%s:%d] ", progname, debugFileName, debugLineNo);
+    }
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
     va_end(ap);
@@ -500,11 +523,30 @@ Error(char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    if (isMultiProc)
-	fprintf(stderr, "[%s] %s (%lu): ERROR: ", StrTime((time_t *)0),
-		progname, (unsigned long)thepid);
-    else
-	fprintf(stderr, "%s: ", progname);
+    if (isMultiProc) {
+	if (fSuppressTime && fSuppressProgname && fSuppressPid)
+	    fprintf(stderr, "ERROR: ");
+	else if (fSuppressTime && fSuppressProgname)
+	    fprintf(stderr, "(%lu): ERROR: ", (unsigned long)thepid);
+	else if (fSuppressTime && fSuppressPid)
+	    fprintf(stderr, "%s: ERROR: ", progname);
+	else if (fSuppressProgname && fSuppressPid)
+	    fprintf(stderr, "[%s] ERROR: ", StrTime((time_t *)0));
+	else if (fSuppressTime)
+	    fprintf(stderr, "%s (%lu): ERROR: ", progname, (unsigned long)thepid);
+	else if (fSuppressProgname)
+	    fprintf(stderr, "[%s] (%lu): ERROR: ", StrTime((time_t *)0), (unsigned long)thepid);
+	else if (fSuppressPid)
+	    fprintf(stderr, "[%s] %s: ERROR: ", StrTime((time_t *)0), progname);
+	else
+	    fprintf(stderr, "[%s] %s (%lu): ERROR: ", StrTime((time_t *)0),
+		    progname, (unsigned long)thepid);
+    } else {
+	if (fSuppressProgname)
+	    fprintf(stderr, "");
+	else
+	    fprintf(stderr, "%s: ", progname);
+    }
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
     va_end(ap);
@@ -516,11 +558,30 @@ Msg(char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    if (isMultiProc)
-	fprintf(stdout, "[%s] %s (%lu): ", StrTime((time_t *)0), progname,
-		(unsigned long)thepid);
-    else
-	fprintf(stdout, "%s: ", progname);
+    if (isMultiProc) {
+	if (fSuppressTime && fSuppressProgname && fSuppressPid)
+	    fprintf(stdout, "");
+	else if (fSuppressTime && fSuppressProgname)
+	    fprintf(stdout, "(%lu): ", (unsigned long)thepid);
+	else if (fSuppressTime && fSuppressPid)
+	    fprintf(stdout, "%s: ", progname);
+	else if (fSuppressProgname && fSuppressPid)
+	    fprintf(stdout, "[%s] ", StrTime((time_t *)0));
+	else if (fSuppressTime)
+	    fprintf(stdout, "%s (%lu): ", progname, (unsigned long)thepid);
+	else if (fSuppressProgname)
+	    fprintf(stdout, "[%s] (%lu): ", StrTime((time_t *)0), (unsigned long)thepid);
+	else if (fSuppressPid)
+	    fprintf(stdout, "[%s] %s: ", StrTime((time_t *)0), progname);
+	else
+	    fprintf(stdout, "[%s] %s (%lu): ", StrTime((time_t *)0), progname,
+		    (unsigned long)thepid);
+    } else {
+	if (fSuppressProgname)
+	    fprintf(stdout, "");
+	else
+	    fprintf(stdout, "%s: ", progname);
+    }
     vfprintf(stdout, fmt, ap);
     fprintf(stdout, "\n");
     va_end(ap);
@@ -535,11 +596,30 @@ Verbose(char *fmt, ...)
 	return;
 
     va_start(ap, fmt);
-    if (isMultiProc)
-	fprintf(stdout, "[%s] %s (%lu): INFO: ", StrTime((time_t *)0),
-		progname, (unsigned long)thepid);
-    else
-	fprintf(stdout, "%s: ", progname);
+    if (isMultiProc) {
+	if (fSuppressTime && fSuppressProgname && fSuppressPid)
+	    fprintf(stdout, "INFO: ");
+	else if (fSuppressTime && fSuppressProgname)
+	    fprintf(stdout, "(%lu): INFO: ", (unsigned long)thepid);
+	else if (fSuppressTime && fSuppressPid)
+	    fprintf(stdout, "%s: INFO: ", progname);
+	else if (fSuppressProgname && fSuppressPid)
+	    fprintf(stdout, "[%s] INFO: ", StrTime((time_t *)0));
+	else if (fSuppressTime)
+	    fprintf(stdout, "%s (%lu): INFO: ", progname, (unsigned long)thepid);
+	else if (fSuppressProgname)
+	    fprintf(stdout, "[%s] (%lu): INFO: ", StrTime((time_t *)0), (unsigned long)thepid);
+	else if (fSuppressPid)
+	    fprintf(stdout, "[%s] %s: INFO: ", StrTime((time_t *)0), progname);
+	else
+	    fprintf(stdout, "[%s] %s (%lu): INFO: ", StrTime((time_t *)0),
+		    progname, (unsigned long)thepid);
+    } else {
+	if (fSuppressProgname)
+	    fprintf(stdout, "");
+	else
+	    fprintf(stdout, "%s: ", progname);
+    }
     vfprintf(stdout, fmt, ap);
     fprintf(stdout, "\n");
     va_end(ap);

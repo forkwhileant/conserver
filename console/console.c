@@ -289,18 +289,21 @@ Usage(int wantfull)
 	"E         ignored - encryption not compiled into code",
 #endif
 	"f(F)      force read/write connection (and replay)",
+	"G         suppress pid in all output messages",
 	"h         output this message",
 	"i(I)      display status info in machine-parseable form (on master)",
 	"k         abort connection if the console is not 'up'",
 	"l user    use username instead of current username",
 	"M master  master server to poll first",
 	"n         do not read system-wide config file",
+	"N         suppress program name in all output messages",
 	"p port    port to connect to",
 	"P         display pids of daemon(s)",
 	"q(Q)      send a quit command to the (master) server",
 	"r(R)      display (master) daemon version (think 'r'emote version)",
 	"s(S)      spy on a console (and replay)",
 	"t         send a text message to [user][@console]",
+	"T         suppress timestamp in all output messages",
 	"u         show users on the various consoles",
 #if HAVE_OPENSSL
 	"U         allow unencrypted connections if SSL not available",
@@ -1927,7 +1930,7 @@ main(int argc, char **argv)
     int fLocal;
     static STRING *acPorts = (STRING *)0;
     static char acOpts[] =
-	"7aAb:B:c:C:d:De:EfFhikIl:M:np:PqQrRsSt:uUvVwWxz:Z:";
+	"7aAb:B:c:C:d:De:EfFGhikIl:M:nNp:PqQrRsSt:TuUvVwWxz:Z:";
     extern int optind;
     extern int optopt;
     extern char *optarg;
@@ -2050,6 +2053,10 @@ main(int argc, char **argv)
 		pcCmd = "force";
 		break;
 
+	    case 'G':		/* suppress pid */
+		fSuppressPid = 1;
+		break;
+
 	    case 'I':
 		fLocal = 1;
 		/* fall through */
@@ -2073,6 +2080,10 @@ main(int argc, char **argv)
 
 	    case 'n':
 		readSystemConf = 0;
+		break;
+
+	    case 'N':		/* suppress progname */
+		fSuppressProgname = 1;
 		break;
 
 	    case 'p':
@@ -2103,6 +2114,10 @@ main(int argc, char **argv)
 		/* fall through */
 	    case 's':		/* spy */
 		pcCmd = "spy";
+		break;
+
+	    case 'T':		/* suppress time */
+		fSuppressTime = 1;
 		break;
 
 	    case 't':

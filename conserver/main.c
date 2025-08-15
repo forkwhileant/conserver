@@ -826,9 +826,10 @@ SummarizeDataStructures(void)
 	 pGE = pGE->pGEnext) {
 	for (pCE = pGE->pCElist; pCE != (CONSENT *)0;
 	     pCE = pCE->pCEnext, count++) {
-	    size += strlen(pCE->server) + sizeof(CONSENT);
+	    if (pCE->server != (char *)0)
+		size += strlen(pCE->server) + sizeof(CONSENT);
 	    if (pCE->host != (char *)0)
-		size += strlen(pCE->server);
+		size += strlen(pCE->host);
 	    if (pCE->device != (char *)0)
 		size += strlen(pCE->device);
 	    if (pCE->exec != (char *)0)

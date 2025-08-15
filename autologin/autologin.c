@@ -460,7 +460,7 @@ make_utmp(char *pclogin, char *pctty)
     auto struct utmp utmp;
 
 
-    if ((char *)0 == pctty) {
+    if ((char *)0 == pclogin || (char *)0 == pctty) {
 	return;
     }
 

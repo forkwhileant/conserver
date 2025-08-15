@@ -116,7 +116,7 @@ Process(void)
 	    exit(1);
 	    /* NOTREACHED */
 	}
-	(void)snprintf(pcCmd, strlen(pcCommand) + 4, "-c %s", pcCommand);
+	snprintf(pcCmd, strlen(pcCommand) + 4, "-c %s", pcCommand);
     }
 
     if ((char *)0 != pcGroup) {
@@ -131,7 +131,7 @@ Process(void)
 	    exit(1);
 	    /* NOTREACHED */
 	}
-	(void)strncpy(acLogin, pwd->pw_name, sizeof(acLogin) - 1);
+	strncpy(acLogin, pwd->pw_name, sizeof(acLogin) - 1);
 	acLogin[sizeof(acLogin) - 1] = '\0';
 	pcLogin = acLogin;
     } else if ((struct passwd *)0 == (pwd = getpwnam(pcLogin))) {
@@ -169,7 +169,7 @@ Process(void)
 			      strerror(errno));
 		exit(1);
 	    }
-	    snprintf(pcDevTty, strlen(pcTty) + 5 + 1, "/dev/%s", pcTty);
+	    snprintf(pcDevTty, strlen(pcTty) + 6, "/dev/%s", pcTty);
 	}
 
 

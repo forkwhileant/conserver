@@ -408,6 +408,9 @@ ConsentFindUser(CONSENTUSERS *pCU, char *id)
     struct group *g = (struct group *)0;
     struct passwd *pwd = (struct passwd *)0;
 
+    if (id == (char *)0)
+	return (CONSENTUSERS *)0;
+
     for (; pCU != (CONSENTUSERS *)0; pCU = pCU->next) {
 	if (pCU->user->name[0] == '@' && pCU->user->name[1] != '\000') {
 	    if (close == 0) {

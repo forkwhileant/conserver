@@ -612,6 +612,7 @@ GetPort(char *pcToHost, unsigned short sPort)
 
     if (connect(s, (struct sockaddr *)(&port), sizeof(port)) < 0) {
 	Error("connect(): %s: %s", port.sun_path, strerror(errno));
+	close(s);
 	return (CONSFILE *)0;
     }
 #else

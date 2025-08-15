@@ -1451,7 +1451,7 @@ main(int argc, char **argv)
 	Error("gethostname(): %s", strerror(errno));
 	Bye(EX_OSERR);
     }
-#if !USE_IPV6
+#if !USE_IPV6 && !USE_UNIX_DOMAIN_SOCKETS
     ProbeInterfaces(bindAddr);
 #endif
 #if !HAVE_CLOSEFROM
@@ -1558,14 +1558,18 @@ main(int argc, char **argv)
 	Error("getaddrinfo(%s): %s", interface, gai_strerror(s));
 	Bye(EX_OSERR);
     }
-#elif USE_UNIX_DOMAIN_SOCKETS
+#endif
+#if USE_UNIX_DOMAIN_SOCKETS
     /* Don't do any redirects if we're purely local
      * (but it allows them to see where remote consoles are)
      */
+#if !USE_IPV6
     optConf->redirect = FLAGFALSE;
+#endif
     if (interface == (char *)0)
 	interface = UDSDIR;
-#else
+#endif
+#if !USE_IPV6 && !USE_UNIX_DOMAIN_SOCKETS
     /* set up the address to bind to */
     if (interface == (char *)0 ||
 	(interface[0] == '*' && interface[1] == '\000'))

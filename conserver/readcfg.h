@@ -31,6 +31,9 @@ typedef struct config {
     FLAG sslreqclientcert;
     char *sslcacertificatefile;
 #endif
+#if USE_UNIX_DOMAIN_SOCKETS
+    mode_t socketmode;
+#endif
 } CONFIG;
 
 typedef struct breaks {

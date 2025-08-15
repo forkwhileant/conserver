@@ -805,8 +805,8 @@ Master(void)
 	return;
     }
 # ifdef TRUST_UDS_CRED
-    /* Allow everyone to connect, but we later auth them via SO_PEERCRED */
-    chmod(master_port.sun_path, 0666);
+    /* Allow configured access to connect, we later auth them via SO_PEERCRED */
+    chmod(master_port.sun_path, config->socketmode);
 # endif
 
 #else

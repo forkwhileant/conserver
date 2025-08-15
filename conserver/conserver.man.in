@@ -3,7 +3,7 @@
 conserver \- console server daemon
 .SH SYNOPSIS
 .B conserver
-.RB [ \-7dDEFhinoRSuvV ]
+.RB [ \-7dDEFhinoRSsuvV ]
 .RB [ \-a
 .IR type ]
 .RB [ \-m
@@ -26,6 +26,8 @@ conserver \- console server daemon
 .IR min ]
 .RB [ \-U
 .IR logfile ]
+.RB [ \-s
+.IR mode ]
 .SH DESCRIPTION
 .B Conserver
 is the daemon that manages
@@ -401,6 +403,16 @@ Remote ports will have the values of the remote hostname and port number.
 Unix domain sockets will have the path to the socket.
 Noop consoles will have nothing.
 .RE
+.TP
+.BI \-s mode
+Set Unix domain socket permissions to
+.I mode
+(in octal).
+The default is 0600.
+This option only applies when conserver is built with Unix domain socket support
+and TRUST_UDS_CRED is defined.
+Without this option, socket permissions are set to provide secure access
+that can be further restricted based on the octal mode specified.
 .TP
 .B \-u
 Send unloved console output to

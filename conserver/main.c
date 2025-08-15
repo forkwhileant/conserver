@@ -75,6 +75,9 @@ CONFIG defConfig =
 #if HAVE_OPENSSL
 	, (char *)0, FLAGTRUE, FLAGFALSE, (char *)0
 #endif
+#if USE_UNIX_DOMAIN_SOCKETS
+	, 0600
+#endif
 };
 
 CONSFILE *unifiedlog = (CONSFILE *)0;
@@ -1229,7 +1232,7 @@ main(int argc, char **argv)
 {
     int i;
     FILE *fpConfig = (FILE *)0;
-    static char acOpts[] = "7a:b:c:C:dDEFhiL:m:M:noO:p:P:RSuU:Vv";
+    static char acOpts[] = "7a:b:c:C:dDEFhiL:m:M:noO:p:P:RSs:uU:Vv";
     extern int optopt;
     extern char *optarg;
     struct passwd *pwd;
@@ -1381,6 +1384,19 @@ main(int argc, char **argv)
 	    case 'S':
 		fSyntaxOnly++;
 		break;
+#if USE_UNIX_DOMAIN_SOCKETS
+	    case 's':
+		{
+		    char *endptr;
+		    long mode = strtol(optarg, &endptr, 8);
+		    if (*endptr != '\0' || mode < 0 || mode > 07777) {
+			Error("invalid socket mode '%s' - must be octal (e.g., 0600)", optarg);
+		    } else {
+			optConf->socketmode = (mode_t)mode;
+		    }
+		}
+		break;
+#endif
 	    case 'u':
 		fAll = 1;
 		break;

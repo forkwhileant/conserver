@@ -58,24 +58,23 @@ jobs:
     - name: Run cppcheck
       run: |
         echo "Running cppcheck static analysis..."
+        echo "================================"
         cppcheck --enable=all --std=c99 --suppress=missingIncludeSystem \
-          --output-file=cppcheck-results.txt \
           conserver/ console/ autologin/ contrib/chat/ || true
+        echo "================================"
         echo "Cppcheck analysis complete"
     
     - name: Run Clang Static Analyzer
       run: |
         echo "Running Clang Static Analyzer..."
-        scan-build --use-analyzer=clang --status-bugs -o clang-analysis \
+        echo "================================"
+        scan-build --use-analyzer=clang --status-bugs -o /tmp/clang-analysis \
           make clean && make || true
+        echo "================================"
         echo "Clang Static Analyzer complete"
-    
-    - name: Upload static analysis results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: static-analysis-results
-        path: |
-          cppcheck-results.txt
-          clang-analysis/
-        if-no-files-found: ignore
+        if [ -d "/tmp/clang-analysis" ] && [ "$(find /tmp/clang-analysis -name '*.html' | wc -l)" -gt 0 ]; then
+          echo "Found static analysis issues:"
+          find /tmp/clang-analysis -name "*.html" -exec echo "Report: {}" \; -exec cat {} \;
+        else
+          echo "No static analysis issues found"
+        fi

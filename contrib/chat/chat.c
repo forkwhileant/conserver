@@ -989,11 +989,11 @@ int c;
     c &= 0x7F;
 
     if (c < 32)
-	sprintf(string, "%s^%c", meta, (int)c + '@');
+	snprintf(string, sizeof(string), "%s^%c", meta, (int)c + '@');
     else if (c == 127)
-	sprintf(string, "%s^?", meta);
+	snprintf(string, sizeof(string), "%s^?", meta);
     else
-	sprintf(string, "%s%c", meta, c);
+	snprintf(string, sizeof(string), "%s%c", meta, c);
 
     return (string);
 }

@@ -365,14 +365,22 @@ DestroyClient(CONSCLIENT *pCL)
 {
     if (pCL == (CONSCLIENT *)0)
 	return;
-    if (pCL->acid != (STRING *)0)
+    if (pCL->acid != (STRING *)0) {
 	DestroyString(pCL->acid);
-    if (pCL->peername != (STRING *)0)
+	pCL->acid = (STRING *)0;
+    }
+    if (pCL->peername != (STRING *)0) {
 	DestroyString(pCL->peername);
-    if (pCL->accmd != (STRING *)0)
+	pCL->peername = (STRING *)0;
+    }
+    if (pCL->accmd != (STRING *)0) {
 	DestroyString(pCL->accmd);
-    if (pCL->username != (STRING *)0)
+	pCL->accmd = (STRING *)0;
+    }
+    if (pCL->username != (STRING *)0) {
 	DestroyString(pCL->username);
+	pCL->username = (STRING *)0;
+    }
     FileClose(&pCL->fd);
     free(pCL);
 }
@@ -390,6 +398,7 @@ DestroyConsentUsers(CONSENTUSERS **cu)
 	free(*cu);
 	(*cu) = n;
     }
+    *cu = (CONSENTUSERS *)0;
 }
 
 CONSENTUSERS *
@@ -1977,6 +1986,7 @@ AttemptGSSAPI(CONSCLIENT *pCL)
     }
     if ((nr = FileRead(pCL->fd, buf, pCL->tokenSize)) <= 0) {
 	free(buf);
+	buf = (char *)0;
 	return nr;
     }
     recvtok.value = buf;
@@ -2017,6 +2027,7 @@ AttemptGSSAPI(CONSCLIENT *pCL)
     }
 
     free(buf);
+    buf = (char *)0;
     return ret;
 }
 #endif

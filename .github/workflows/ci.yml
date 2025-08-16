@@ -142,6 +142,8 @@ jobs:
       matrix:
         include:
           # AlmaLinux (RHEL derivative)
+          - container: almalinux:10
+            name: AlmaLinux 10
           - container: almalinux:9
             name: AlmaLinux 9
           - container: almalinux:8
@@ -202,13 +204,13 @@ jobs:
     strategy:
       matrix:
         include:
-          - version: '13.4'
+          - version: '13.5'
             config: 'basic'
-          - version: '13.4'
+          - version: '13.5'
             config: 'uds'
-          - version: '14.2'
+          - version: '14.3'
             config: 'basic'
-          - version: '14.2'
+          - version: '14.3'
             config: 'uds'
     
     name: Test FreeBSD ${{ matrix.version }} (${{ matrix.config }})

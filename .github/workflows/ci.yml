@@ -44,12 +44,16 @@ jobs:
         else
           export CC=gcc
         fi
-        CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2" \
+        # Don't use -Werror during configure as it breaks feature detection
+        CFLAGS="-Wall -Wextra -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2" \
         LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
         ./configure
     
     - name: Build
-      run: make
+      run: |
+        # Add -Werror for the actual build
+        export CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2"
+        make
     
     - name: Run tests
       run: make test
@@ -171,12 +175,16 @@ jobs:
         if [ ! -f config.sub ]; then
           automake --add-missing --copy 2>/dev/null || true
         fi
-        CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2" \
+        # Don't use -Werror during configure as it breaks feature detection
+        CFLAGS="-Wall -Wextra -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2" \
         LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
         ./configure
     
     - name: Build
-      run: make
+      run: |
+        # Add -Werror for the actual build
+        export CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2"
+        make
     
     - name: Run tests
       run: make test
@@ -215,8 +223,10 @@ jobs:
           if [ ! -f config.sub ]; then
             automake --add-missing --copy 2>/dev/null || true
           fi
-          CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE -O2" ./configure
-          gmake
+          # Don't use -Werror during configure as it breaks feature detection
+          CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure
+          # Add -Werror for the actual build
+          CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE -O2" gmake
           gmake test
     
     - name: Test with Unix domain sockets
@@ -231,8 +241,10 @@ jobs:
           if [ ! -f config.sub ]; then
             automake --add-missing --copy 2>/dev/null || true
           fi
-          CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE -O2" ./configure --with-uds
-          gmake
+          # Don't use -Werror during configure as it breaks feature detection
+          CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure --with-uds
+          # Add -Werror for the actual build
+          CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE -O2" gmake
           gmake test
 
   sanitizer-tests:

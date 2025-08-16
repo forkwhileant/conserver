@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential autotools-dev autoconf libc6-dev
+        sudo apt-get install -y build-essential autotools-dev autoconf automake libtool pkg-config
     
     - name: Configure
       run: |
@@ -40,7 +40,7 @@ jobs:
         else
           export CC=gcc
         fi
-        CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong -O2" \
+        CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2" \
         LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
         ./configure
     
@@ -150,16 +150,16 @@ jobs:
     - name: Install dependencies
       run: |
         if [[ "${{ matrix.container }}" == almalinux:* ]]; then
-          dnf install -y gcc make autoconf automake libtool
+          dnf install -y gcc make autoconf automake libtool diffutils findutils
         elif [[ "${{ matrix.container }}" == fedora:* ]]; then
           # Fedora minimal containers need more packages
-          dnf install -y gcc make autoconf automake libtool diffutils
+          dnf install -y gcc make autoconf automake libtool diffutils findutils glibc-devel
         fi
     
     - name: Configure
       run: |
         autoreconf -fiv
-        CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong -O2" \
+        CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2" \
         LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
         ./configure
     
@@ -193,7 +193,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential autotools-dev autoconf libc6-dev
+        sudo apt-get install -y build-essential autotools-dev autoconf automake libtool pkg-config
     
     - name: Configure with ${{ matrix.sanitizer }} sanitizer
       run: |

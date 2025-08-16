@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential autotools-dev autoconf
+        sudo apt-get install -y build-essential autotools-dev autoconf libc6-dev
     
     - name: Configure
       run: |
@@ -193,7 +193,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential autotools-dev autoconf
+        sudo apt-get install -y build-essential autotools-dev autoconf libc6-dev
     
     - name: Configure with ${{ matrix.sanitizer }} sanitizer
       run: |

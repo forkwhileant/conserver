@@ -63,7 +63,7 @@ jobs:
         if-no-files-found: ignore
   static-analysis:
     runs-on: ubuntu-latest
-    needs: test  # Run after the test job completes successfully
+    # Run in parallel with tests for faster feedback
     
     steps:
     - uses: actions/checkout@v4

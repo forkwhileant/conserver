@@ -976,8 +976,12 @@ GetUserInput(STRING *str)
     BuildString((char *)0, str);
 
     for (;;) {
-	if (read(0, &c, 1) == 0)
-	    break;
+	int n = read(0, &c, 1);
+	if (n <= 0) {
+		if (n < 0 && errno != EINTR)
+		Error("read(): %s", strerror(errno));
+		break;
+	}
 	if (c == '\n' || c == '\r') {
 	    break;
 	}

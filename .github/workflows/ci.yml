@@ -19,8 +19,6 @@ jobs:
             compiler: clang
           - os: ubuntu-22.04
             compiler: gcc
-          - os: ubuntu-20.04
-            compiler: gcc
     
     name: Test on ${{ matrix.os }} with ${{ matrix.compiler }}
     

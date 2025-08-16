@@ -203,14 +203,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: ['13.4', '14.2']
+        include:
+          - version: '13.4'
+            config: 'basic'
+          - version: '13.4'
+            config: 'uds'
+          - version: '14.2'
+            config: 'basic'
+          - version: '14.2'
+            config: 'uds'
     
-    name: Test on FreeBSD ${{ matrix.version }}
+    name: Test FreeBSD ${{ matrix.version }} (${{ matrix.config }})
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Test on FreeBSD ${{ matrix.version }}
+    - name: Test on FreeBSD ${{ matrix.version }} with ${{ matrix.config }} config
       uses: vmactions/freebsd-vm@v1
       with:
         release: ${{ matrix.version }}
@@ -223,26 +231,12 @@ jobs:
           if [ ! -f config.sub ]; then
             automake --add-missing --copy 2>/dev/null || true
           fi
-          # Don't use -Werror during configure as it breaks feature detection
-          CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure
-          # Add -Werror for the actual build
-          CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE -O2" gmake
-          gmake test
-    
-    - name: Test with Unix domain sockets
-      uses: vmactions/freebsd-vm@v1
-      with:
-        release: ${{ matrix.version }}
-        usesh: true
-        prepare: |
-          pkg install -y autoconf automake libtool gmake
-        run: |
-          autoreconf -fiv
-          if [ ! -f config.sub ]; then
-            automake --add-missing --copy 2>/dev/null || true
+          # Configure based on test type
+          if [ "${{ matrix.config }}" = "uds" ]; then
+            CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure --with-uds
+          else
+            CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure
           fi
-          # Don't use -Werror during configure as it breaks feature detection
-          CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure --with-uds
           # Add -Werror for the actual build
           CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE -O2" gmake
           gmake test

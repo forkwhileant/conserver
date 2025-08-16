@@ -1626,11 +1626,7 @@ DoCmds(char *master, char *pports, int cmdi)
 	} else
 	    server = master;
 
-#if USE_UNIX_DOMAIN_SOCKETS
-	serverName = "localhost";
-#else
 	serverName = server;
-#endif
 
 	if (*ports == '\000') {
 #if USE_IPV6

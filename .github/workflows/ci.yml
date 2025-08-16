@@ -21,6 +21,8 @@ jobs:
     - name: Configure
       run: |
         autoreconf -fiv
+        CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong -O2" \
+        LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
         ./configure
     
     - name: Build

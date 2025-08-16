@@ -191,6 +191,50 @@ jobs:
           test/conserver.log
         if-no-files-found: ignore
 
+  test-freebsd:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['13.4', '14.2']
+    
+    name: Test on FreeBSD ${{ matrix.version }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Test on FreeBSD ${{ matrix.version }}
+      uses: vmactions/freebsd-vm@v1
+      with:
+        release: ${{ matrix.version }}
+        usesh: true
+        prepare: |
+          pkg install -y autoconf automake libtool gmake
+        run: |
+          autoreconf -fiv
+          # Ensure config.sub and config.guess exist
+          if [ ! -f config.sub ]; then
+            automake --add-missing --copy 2>/dev/null || true
+          fi
+          CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE -O2" ./configure
+          gmake
+          gmake test
+    
+    - name: Test with Unix domain sockets
+      uses: vmactions/freebsd-vm@v1
+      with:
+        release: ${{ matrix.version }}
+        usesh: true
+        prepare: |
+          pkg install -y autoconf automake libtool gmake
+        run: |
+          autoreconf -fiv
+          if [ ! -f config.sub ]; then
+            automake --add-missing --copy 2>/dev/null || true
+          fi
+          CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE -O2" ./configure --with-uds
+          gmake
+          gmake test
+
   sanitizer-tests:
     runs-on: ubuntu-latest
     strategy:

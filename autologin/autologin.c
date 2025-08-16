@@ -536,13 +536,17 @@ make_utmp(char *pclogin, char *pctty)
     /* look through /etc/utmp by hand (sigh)
      */
     iFound = iPos = 0;
-    while (sizeof(utmp) == read(fdUtmp, &utmp, sizeof(utmp))) {
+    ssize_t n;
+    while ((n = read(fdUtmp, &utmp, sizeof(utmp))) == sizeof(utmp)) {
 	if (0 == strncmp(utmp.ut_line, pcDev, sizeof(utmp.ut_line))) {
 	    ++iFound;
 	    break;
 	}
 	iPos++;
     }
+	if (n < 0) {
+	fprintf(stderr, "%s: read: %s\n", progname, strerror(errno));
+	}
     (void)strncpy(utmp.ut_name, pclogin, sizeof(utmp.ut_name));
 # endif
 #endif

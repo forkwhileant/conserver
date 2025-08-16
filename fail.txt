@@ -1,0 +1,170 @@
+  ( cd test && ./dotest ) || exit 1
+  starting conserver...pid 2321
+  executing test #1...failed (diffs in test1.diff)
+  --- Diff contents for test1 ---
+  1,2d0
+  <  shell up <none>
+  <  shell up <none>
+  --- End of diff for test1 ---
+  executing test #2...failed (diffs in test2.diff)
+  --- Diff contents for test2 ---
+  1,20c1
+  < [Enter `^Ec?' for help]
+  < [help]
+  <  .       disconnect                     ;       move to another console
+  <  a       attach read/write              b       send broadcast message
+  <  c       toggle flow control            d       down a console
+  <  e       change escape sequence         f       force attach read/write
+  <  g       group info                     i       information dump
+  <  L       toggle logging on/off          l?      break sequence list
+  <  l0      send break per config file     l1-9a-z send specific break sequence
+  <  m       display message of the day     n       write a note to the logfile
+  <  o       (re)open the tty and log file  p       playback the last 60 lines
+  <  P       set number of playback lines   r       replay the last 20 lines
+  <  R       set number of replay lines     s       spy mode (read only)
+  <  u       show host status               v       show version info
+  <  w       who is on this console         x       show console baud info
+  <  z       suspend the connection         !       invoke task
+  <  |       attach local command           ?       print this message
+  <  <cr>    ignore/abort command           ^R      replay the last line
+  <  \ooo    send character by octal code
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test2 ---
+  executing test #3...failed (diffs in test3.diff)
+  --- Diff contents for test3 ---
+  1,9c1
+  < [Enter `^Ec?' for help]
+  < [halt list]
+  <  0 - 250ms, `\z'
+  <  1 - 250ms, `\z'
+  <  2 - 250ms, `\r~^b'
+  <  3 - 250ms, `#.'
+  <  4 - 600ms, `\r\d~\d^b'
+  <  5 - 250ms, `\rtest\r'
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test3 ---
+  executing test #4...failed (diffs in test4.diff)
+  --- Diff contents for test4 ---
+  1,3c1
+  < [Enter `^Ec?' for help]
+  < [line down]
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test4 ---
+  executing test #5...failed (diffs in test5.diff)
+  --- Diff contents for test5 ---
+  1,4c1
+  < [`shell' -- console is down]
+  < [Enter `^Ec?' for help]
+  < [up]
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test5 ---
+  moving in second config file
+  executing test #6...failed (diffs in test6.diff)
+  --- Diff contents for test6 ---
+  1,3d0
+  <  shellb up <none>
+  <  shella up <none>
+  <  shell up <none>
+  --- End of diff for test6 ---
+  executing test #7...failed (diffs in test7.diff)
+  --- Diff contents for test7 ---
+  1,20c1
+  < [Enter `^Ec?' for help]
+  < [help]
+  <  .       disconnect                     ;       move to another console
+  <  a       attach read/write              b       send broadcast message
+  <  c       toggle flow control            d       down a console
+  <  e       change escape sequence         f       force attach read/write
+  <  g       group info                     i       information dump
+  <  L       toggle logging on/off          l?      break sequence list
+  <  l0      send break per config file     l1-9a-z send specific break sequence
+  <  m       display message of the day     n       write a note to the logfile
+  <  o       (re)open the tty and log file  p       playback the last 60 lines
+  <  P       set number of playback lines   r       replay the last 20 lines
+  <  R       set number of replay lines     s       spy mode (read only)
+  <  u       show host status               v       show version info
+  <  w       who is on this console         x       show console baud info
+  <  z       suspend the connection         !       invoke task
+  <  |       attach local command           ?       print this message
+  <  <cr>    ignore/abort command           ^R      replay the last line
+  <  \ooo    send character by octal code
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test7 ---
+  executing test #8...failed (diffs in test8.diff)
+  --- Diff contents for test8 ---
+  1,8c1
+  < [Enter `^Ec?' for help]
+  < [halt list]
+  <  0 - 250ms, `\z'
+  <  1 - 250ms, `\z'
+  <  2 - 250ms, `\r~^b'
+  <  3 - 250ms, `#.'
+  <  4 - 250ms, `hiya there\r'
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test8 ---
+  executing test #9...failed (diffs in test9.diff)
+  --- Diff contents for test9 ---
+  1,3c1
+  < [Enter `^Ec?' for help]
+  < [line down]
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test9 ---
+  executing test #10...failed (diffs in test10.diff)
+  --- Diff contents for test10 ---
+  1,6c1
+  < [`shell' -- console is down]
+  < [Enter `^Ec?' for help]
+  < [up]
+  < [ok]
+  < [up]
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test10 ---
+  executing test #11...failed (diffs in test11.diff)
+  --- Diff contents for test11 ---
+  1,2c1
+  < [Enter `tu?' for help]
+  < [disconnect]
+  ---
+  > localhost: automatic redirection disabled - console on master `127.0.0.1'
+  --- End of diff for test11 ---
+  executing test #12...succeeded
+  executing test #13...failed (diffs in test13.diff)
+  --- Diff contents for test13 ---
+  1,3d0
+  <  shellb                   on at   Local 
+  <  shella                   on at   Local 
+  <  shell                    on at   Local 
+  --- End of diff for test13 ---
+  executing test #14...failed (diffs in test14.diff)
+  --- Diff contents for test14 ---
+  2c2
+  < 	choices are shellb, shella, shell
+  ---
+  > 	choices are shell, shella, shellb
+  --- End of diff for test14 ---
+  executing test #15...failed (diffs in test15.diff)
+  --- Diff contents for test15 ---
+  1c1
+  <  shell                    on at   Local 
+  ---
+  > localhost: automatic redirection disabled - console on `127.0.0.1'
+  --- End of diff for test15 ---
+  gmake: *** [Makefile:36: test] Error 1
+  exec shell: bash run.sh showDebugInfo
+  /usr/bin/bash

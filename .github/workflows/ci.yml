@@ -17,10 +17,13 @@ jobs:
             compiler: gcc
           - os: ubuntu-latest
             compiler: clang
+          - os: ubuntu-latest
+            compiler: gcc
+            config: uds
           - os: ubuntu-22.04
             compiler: gcc
     
-    name: Test on ${{ matrix.os }} with ${{ matrix.compiler }}
+    name: Test on ${{ matrix.os }} with ${{ matrix.compiler }}${{ matrix.config && format(' ({0})', matrix.config) || '' }}
     
     steps:
     - uses: actions/checkout@v4
@@ -43,9 +46,14 @@ jobs:
           export CC=gcc
         fi
         # Don't use -Werror during configure as it breaks feature detection
+        if [ "${{ matrix.config }}" = "uds" ]; then
+          CONFIGURE_OPTS="--with-uds"
+        else
+          CONFIGURE_OPTS=""
+        fi
         CFLAGS="-Wall -Wextra -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2" \
         LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
-        ./configure
+        ./configure $CONFIGURE_OPTS
     
     - name: Build
       run: |

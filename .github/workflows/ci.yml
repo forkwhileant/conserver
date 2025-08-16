@@ -149,10 +149,11 @@ jobs:
     
     - name: Install dependencies
       run: |
-        if [[ "${{ matrix.container }}" == almalinux:* ]] || [[ "${{ matrix.container }}" == rockylinux:* ]]; then
+        if [[ "${{ matrix.container }}" == almalinux:* ]]; then
           dnf install -y gcc make autoconf automake libtool
         elif [[ "${{ matrix.container }}" == fedora:* ]]; then
-          dnf install -y gcc make autoconf automake libtool
+          # Fedora minimal containers need more packages
+          dnf install -y gcc make autoconf automake libtool diffutils
         fi
     
     - name: Configure

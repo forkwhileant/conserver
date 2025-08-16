@@ -35,6 +35,10 @@ jobs:
     - name: Configure
       run: |
         autoreconf -fiv
+        # Ensure config.sub and config.guess exist
+        if [ ! -f config.sub ]; then
+          automake --add-missing --copy 2>/dev/null || true
+        fi
         if [ "${{ matrix.compiler }}" = "clang" ]; then
           export CC=clang
         else
@@ -90,11 +94,15 @@ jobs:
     - name: Install static analysis tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y cppcheck clang clang-tools build-essential autotools-dev autoconf
+        sudo apt-get install -y cppcheck clang clang-tools build-essential autotools-dev autoconf automake libtool
     
     - name: Configure project
       run: |
         autoreconf -fiv
+        # Ensure config.sub and config.guess exist
+        if [ ! -f config.sub ]; then
+          automake --add-missing --copy 2>/dev/null || true
+        fi
         ./configure
     
     - name: Run Clang Static Analyzer
@@ -159,6 +167,10 @@ jobs:
     - name: Configure
       run: |
         autoreconf -fiv
+        # Ensure config.sub and config.guess exist
+        if [ ! -f config.sub ]; then
+          automake --add-missing --copy 2>/dev/null || true
+        fi
         CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -fstack-protector-strong -O2" \
         LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
         ./configure
@@ -198,11 +210,15 @@ jobs:
     - name: Configure with ${{ matrix.sanitizer }} sanitizer
       run: |
         autoreconf -fiv
+        # Ensure config.sub and config.guess exist
+        if [ ! -f config.sub ]; then
+          automake --add-missing --copy 2>/dev/null || true
+        fi
         if [ "${{ matrix.sanitizer }}" = "address" ]; then
-          export CFLAGS="-fsanitize=address -fno-omit-frame-pointer -g"
+          export CFLAGS="-fsanitize=address -fno-omit-frame-pointer -g -D_GNU_SOURCE"
           export LDFLAGS="-fsanitize=address"
         elif [ "${{ matrix.sanitizer }}" = "undefined" ]; then
-          export CFLAGS="-fsanitize=undefined -fno-omit-frame-pointer -g"
+          export CFLAGS="-fsanitize=undefined -fno-omit-frame-pointer -g -D_GNU_SOURCE"
           export LDFLAGS="-fsanitize=undefined"
         fi
         ./configure

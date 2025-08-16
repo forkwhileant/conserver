@@ -11,8 +11,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-22.04, ubuntu-20.04]
-        compiler: [gcc, clang]
+        include:
+          # Ubuntu versions
+          - os: ubuntu-latest
+            compiler: gcc
+          - os: ubuntu-latest
+            compiler: clang
+          - os: ubuntu-22.04
+            compiler: gcc
+          - os: ubuntu-20.04
+            compiler: gcc
     
     name: Test on ${{ matrix.os }} with ${{ matrix.compiler }}
     
@@ -116,6 +124,59 @@ jobs:
           conserver/ console/ autologin/ contrib/chat/
         echo "================================"
         echo "Cppcheck analysis complete"
+
+  test-rhel-derivatives:
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    strategy:
+      matrix:
+        include:
+          # AlmaLinux (RHEL derivative)
+          - container: almalinux:9
+            name: AlmaLinux 9
+          - container: almalinux:8
+            name: AlmaLinux 8
+          # Fedora (upstream of RHEL)
+          - container: fedora:41
+            name: Fedora 41
+          - container: fedora:40
+            name: Fedora 40
+    
+    name: Test on ${{ matrix.name }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        if [[ "${{ matrix.container }}" == almalinux:* ]] || [[ "${{ matrix.container }}" == rockylinux:* ]]; then
+          dnf install -y gcc make autoconf automake libtool
+        elif [[ "${{ matrix.container }}" == fedora:* ]]; then
+          dnf install -y gcc make autoconf automake libtool
+        fi
+    
+    - name: Configure
+      run: |
+        autoreconf -fiv
+        CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong -O2" \
+        LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
+        ./configure
+    
+    - name: Build
+      run: make
+    
+    - name: Run tests
+      run: make test
+    
+    - name: Upload test artifacts
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.name }}-test-results
+        path: |
+          test/*.diff
+          test/conserver.log
+        if-no-files-found: ignore
 
   sanitizer-tests:
     runs-on: ubuntu-latest

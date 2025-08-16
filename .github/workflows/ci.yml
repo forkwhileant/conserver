@@ -105,3 +105,53 @@ jobs:
           conserver/ console/ autologin/ contrib/chat/
         echo "================================"
         echo "Cppcheck analysis complete"
+
+  sanitizer-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sanitizer: [address, undefined]
+    
+    name: Test with ${{ matrix.sanitizer }} sanitizer
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential autotools-dev autoconf
+    
+    - name: Configure with ${{ matrix.sanitizer }} sanitizer
+      run: |
+        autoreconf -fiv
+        if [ "${{ matrix.sanitizer }}" = "address" ]; then
+          export CFLAGS="-fsanitize=address -fno-omit-frame-pointer -g"
+          export LDFLAGS="-fsanitize=address"
+        elif [ "${{ matrix.sanitizer }}" = "undefined" ]; then
+          export CFLAGS="-fsanitize=undefined -fno-omit-frame-pointer -g"
+          export LDFLAGS="-fsanitize=undefined"
+        fi
+        ./configure
+    
+    - name: Build with sanitizer
+      run: make
+    
+    - name: Run tests with sanitizer
+      run: |
+        if [ "${{ matrix.sanitizer }}" = "address" ]; then
+          export ASAN_OPTIONS=detect_leaks=1:check_initialization_order=1:strict_string_checks=1
+        elif [ "${{ matrix.sanitizer }}" = "undefined" ]; then
+          export UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1
+        fi
+        make test
+    
+    - name: Upload sanitizer logs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.sanitizer }}-sanitizer-results
+        path: |
+          test/*.diff
+          test/conserver.log
+        if-no-files-found: ignore

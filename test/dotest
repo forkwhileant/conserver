@@ -43,6 +43,10 @@ dotest()
 		rm -f test$testnum.diff
 	    else
 		echo "failed (diffs in test$testnum.diff)"
+		# Output the diff so we can see what failed in CI
+		echo "--- Diff contents for test$testnum ---"
+		cat test$testnum.diff
+		echo "--- End of diff for test$testnum ---"
 		exitval=1
 	    fi
 	else

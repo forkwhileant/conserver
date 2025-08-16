@@ -20,6 +20,12 @@ jobs:
           - os: ubuntu-latest
             compiler: gcc
             config: uds
+          - os: ubuntu-latest
+            compiler: gcc
+            config: openssl
+          - os: ubuntu-latest
+            compiler: gcc
+            config: ipv6
           - os: ubuntu-22.04
             compiler: gcc
     
@@ -32,6 +38,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential autotools-dev autoconf automake libtool pkg-config
+        # Install OpenSSL development files if needed
+        if [ "${{ matrix.config }}" = "openssl" ]; then
+          sudo apt-get install -y libssl-dev
+        fi
     
     - name: Configure
       run: |
@@ -48,6 +58,10 @@ jobs:
         # Don't use -Werror during configure as it breaks feature detection
         if [ "${{ matrix.config }}" = "uds" ]; then
           CONFIGURE_OPTS="--with-uds"
+        elif [ "${{ matrix.config }}" = "openssl" ]; then
+          CONFIGURE_OPTS="--with-openssl"
+        elif [ "${{ matrix.config }}" = "ipv6" ]; then
+          CONFIGURE_OPTS="--with-ipv6"
         else
           CONFIGURE_OPTS=""
         fi
@@ -220,6 +234,10 @@ jobs:
             config: 'basic'
           - version: '14.3'
             config: 'uds'
+          - version: '14.3'
+            config: 'openssl'
+          - version: '14.3'
+            config: 'ipv6'
     
     name: Test FreeBSD ${{ matrix.version }} (${{ matrix.config }})
     
@@ -233,6 +251,10 @@ jobs:
         usesh: true
         prepare: |
           pkg install -y autoconf automake libtool gmake
+          # Install OpenSSL if needed (usually already present)
+          if [ "${{ matrix.config }}" = "openssl" ]; then
+            pkg install -y openssl
+          fi
         run: |
           autoreconf -fiv
           # Ensure config.sub and config.guess exist
@@ -242,6 +264,10 @@ jobs:
           # Configure based on test type
           if [ "${{ matrix.config }}" = "uds" ]; then
             CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure --with-uds
+          elif [ "${{ matrix.config }}" = "openssl" ]; then
+            CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure --with-openssl
+          elif [ "${{ matrix.config }}" = "ipv6" ]; then
+            CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure --with-ipv6
           else
             CFLAGS="-Wall -Wextra -D_GNU_SOURCE -O2" ./configure
           fi

@@ -59,7 +59,7 @@ jobs:
       run: |
         echo "Running cppcheck static analysis..."
         echo "================================"
-        cppcheck --enable=all --std=c99 --suppress=missingIncludeSystem \
+        cppcheck --enable=all --std=c99 --suppress=missingIncludeSystem --force \
           conserver/ console/ autologin/ contrib/chat/ || true
         echo "================================"
         echo "Cppcheck analysis complete"

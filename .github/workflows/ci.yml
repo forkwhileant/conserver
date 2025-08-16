@@ -8,7 +8,13 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-22.04, ubuntu-20.04]
+        compiler: [gcc, clang]
+    
+    name: Test on ${{ matrix.os }} with ${{ matrix.compiler }}
     
     steps:
     - uses: actions/checkout@v4
@@ -21,6 +27,11 @@ jobs:
     - name: Configure
       run: |
         autoreconf -fiv
+        if [ "${{ matrix.compiler }}" = "clang" ]; then
+          export CC=clang
+        else
+          export CC=gcc
+        fi
         CFLAGS="-Wall -Wextra -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong -O2" \
         LDFLAGS="-Wl,-z,relro -Wl,-z,now" \
         ./configure

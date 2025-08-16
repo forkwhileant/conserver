@@ -1257,9 +1257,13 @@ WriteLog(CONSENT *pCE, char *s, int len)
 	}
     }
     if (i < j) {
-	FileWrite(pCE->fdlog, FLAGTRUE, s + i, j - i);
+	if (FileWrite(pCE->fdlog, FLAGTRUE, s + i, j - i) < 0) {
+		CONDDEBUG((1, "WriteLog(): [%s] FileWrite failed", pCE->server));
+	}
     }
-    FileWrite(pCE->fdlog, FLAGFALSE, (char *)0, 0);
+	if (FileWrite(pCE->fdlog, FLAGFALSE, (char *)0, 0) < 0) {
+		CONDDEBUG((1, "WriteLog(): [%s] FileWrite flush failed", pCE->server));
+	}
 }
 
 static RETSIGTYPE
@@ -2744,8 +2748,11 @@ DoConsoleRead(CONSENT *pCEServing)
     /* if we have a command running, interface with it and then
      * allow the normal stuff to happen (so folks can watch)
      */
-    if (pCEServing->initfile != (CONSFILE *)0)
-	FileWrite(pCEServing->initfile, FLAGFALSE, (char *)acIn, nr);
+    if (pCEServing->initfile != (CONSFILE *)0) {
+	if (FileWrite(pCEServing->initfile, FLAGFALSE, (char *)acIn, nr) < 0) {
+		Error("FileWrite(): failed to write to init file");
+	}
+    }
 
     /* output all console info nobody is attached
      * or output to unifiedlog if it's open

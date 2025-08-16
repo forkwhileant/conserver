@@ -29,6 +29,27 @@ jobs:
     - name: Run tests
       run: make test
     
+    - name: Display test failures
+      if: failure()
+      run: |
+        echo "Test failures detected. Displaying error details:"
+        echo "================================================"
+        if [ -d test ]; then
+          cd test
+          for diff_file in *.diff; do
+            if [ -f "$diff_file" ]; then
+              echo "--- Failure in $diff_file ---"
+              cat "$diff_file"
+              echo ""
+            fi
+          done
+          if [ -f conserver.log ]; then
+            echo "--- Conserver log ---"
+            tail -50 conserver.log
+          fi
+        fi
+        echo "================================================"
+    
     - name: Upload test artifacts
       if: always()
       uses: actions/upload-artifact@v4
@@ -55,6 +76,24 @@ jobs:
         autoreconf -fiv
         ./configure
     
+    - name: Run Clang Static Analyzer
+      run: |
+        echo "Running Clang Static Analyzer..."
+        echo "================================"
+        CLANG_VERSION=$(ls /usr/bin/clang-* | grep -E 'clang-[0-9]+$' | sed 's/.*clang-//' | head -1)
+        
+        scan-build --use-analyzer=/usr/bin/clang-${CLANG_VERSION} --status-bugs \
+          -o /tmp/clang-analysis --html-title="Static Analysis Results" \
+          --exclude /usr/include \
+          make clean && make
+        echo "================================"
+        echo "Clang Static Analyzer complete"
+        if [ -d "/tmp/clang-analysis" ] && find /tmp/clang-analysis -name '*.html' | grep -q .; then
+          echo "::error::Static analysis found issues"
+          find /tmp/clang-analysis -name "index.html" -exec dirname {} \; | head -1 | xargs -I {} echo "Report directory: {}"
+          exit 1
+        fi
+    
     - name: Run cppcheck
       run: |
         echo "Running cppcheck static analysis..."
@@ -63,18 +102,3 @@ jobs:
           conserver/ console/ autologin/ contrib/chat/ || true
         echo "================================"
         echo "Cppcheck analysis complete"
-    
-    - name: Run Clang Static Analyzer
-      run: |
-        echo "Running Clang Static Analyzer..."
-        echo "================================"
-        scan-build --use-analyzer=clang --status-bugs -o /tmp/clang-analysis \
-          make clean && make || true
-        echo "================================"
-        echo "Clang Static Analyzer complete"
-        if [ -d "/tmp/clang-analysis" ] && [ "$(find /tmp/clang-analysis -name '*.html' | wc -l)" -gt 0 ]; then
-          echo "Found static analysis issues:"
-          find /tmp/clang-analysis -name "*.html" -exec echo "Report: {}" \; -exec cat {} \;
-        else
-          echo "No static analysis issues found"
-        fi

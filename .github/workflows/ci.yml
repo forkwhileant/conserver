@@ -99,6 +99,7 @@ jobs:
         echo "Running cppcheck static analysis..."
         echo "================================"
         cppcheck --enable=all --std=c99 --suppress=missingIncludeSystem --force \
-          conserver/ console/ autologin/ contrib/chat/ || true
+          --error-exitcode=1 \
+          conserver/ console/ autologin/ contrib/chat/
         echo "================================"
         echo "Cppcheck analysis complete"
